@@ -13,6 +13,7 @@ from fair.stac.constants import (
     CONTAINER_REGISTRIES,
     DATACUBE_SCHEMA,
     DATASET_EXTENSIONS,
+    LABEL_CLASS_PROPERTY,
     LOCAL_MODEL_EXTENSIONS,
     OCI_IMAGE_INDEX_TYPE,
 )
@@ -242,8 +243,13 @@ def build_dataset_item(
 
     resolved_id = item_id if item_id is not None else _slugify(title)
 
+    # A caller that passes `label_properties` is describing its own label file and is
+    # left alone. Otherwise the labels came from `fair.datasets`, so declare the key
+    # that module stamps rather than "class", which appears on no feature it writes.
     resolved_label_properties = (
-        label_properties if label_properties is not None else (None if label_type == "raster" else ["class"])
+        label_properties
+        if label_properties is not None
+        else (None if label_type == "raster" else [LABEL_CLASS_PROPERTY])
     )
 
     properties: dict[str, Any] = {
